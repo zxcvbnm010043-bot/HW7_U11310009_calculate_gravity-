@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重力測站數據計算結果</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #0056b3; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #e9ecef; color: #333; }
+        .data-table th { background-color: #007bff; color: white; }
+        .result-table th { background-color: #28a745; color: white; }
+        .note { background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 10px; margin-top: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌎 重力測站數據計算結果 (Gravity Station Data Calculation Results)</h1>
+    
+    <h2>📊 給定數據 (Given Data)</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>項目 (Item)</th>
+                <th>符號 (Symbol)</th>
+                <th>數值 (Value)</th>
+                <th>單位 (Unit)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>緯度 (Latitude)</td>
+                <td>&phi;</td> <td>48.1195° N</td>
+                <td>度</td>
+            </tr>
+            <tr>
+                <td>高程 (Elevation)</td>
+                <td>h</td> <td>487.9</td>
+                <td>m</td>
+            </tr>
+            <tr>
+                <td>觀測重力 (Observed gravity)</td>
+                <td>g<sub>obs</sub></td> <td>980,717.39</td>
+                <td>mGal</td>
+            </tr>
+            <tr>
+                <td>標準岩石密度 (Standard Rock Density)</td>
+                <td>&rho;</td> <td>2.67</td>
+                <td>g/cm³</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>a) 陸地測站計算結果 (Land Station Calculation Results)</h2>
+    
+    <table class="result-table">
+        <thead>
+            <tr>
+                <th>項目 (Calculation)</th>
+                <th>公式 (Formula)</th>
+                <th>結果 (Result) (mGal)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>i) 理論重力 (Theoretical Gravity, &gamma;)</td> <td>國際重力公式 (GRS67)</td>
+                <td>980,683.08</td>
+            </tr>
+            <tr>
+                <td>ii) 自由空間校正 (Free Air Correction, C<sub>FA</sub>)</td>
+                <td>0.3086 &times; h</td>
+                <td>150.59</td>
+            </tr>
+            <tr>
+                <td>iii) 布格校正 (Bouguer Correction, C<sub>B</sub>)</td>
+                <td>0.04193 &times; &rho; &times; h</td>
+                <td>54.67</td>
+            </tr>
+            <tr>
+                <td>iv) 自由空間重力異常 (&Delta;g<sub>FA</sub>)</td> <td>g<sub>obs</sub> + C<sub>FA</sub> - &gamma;</td>
+                <td>184.90</td>
+            </tr>
+            <tr>
+                <td>v) 布格重力異常 (&Delta;g<sub>B</sub>)</td>
+                <td>&Delta;g<sub>FA</sub> - C<sub>B</sub></td>
+                <td>130.23</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>b) 假設情景 (海上測站) 重新計算 (Recalculations for Ocean Station)</h2>
+    <div class="note">
+        **情景**: 測站位於海平面 (高程 h=0)，水深 D=487.9 m。<br>
+        **理論重力** (&gamma;) 與觀測重力 (g<sub>obs</sub>) 保持不變。
+    </div>
+
+    <table class="result-table">
+        <thead>
+            <tr>
+                <th>項目 (Calculation)</th>
+                <th>公式/備註 (Formula/Notes)</th>
+                <th>結果 (Result) (mGal)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>自由空間校正 (C<sub>FA</sub>)</td>
+                <td>h=0, 所以 C<sub>FA</sub>=0</td>
+                <td>0.00</td>
+            </tr>
+            <tr>
+                <td>自由空間重力異常 (&Delta;g<sub>FA</sub>)</td>
+                <td>g<sub>obs</sub> + 0 - &gamma;</td>
+                <td>34.31</td>
+            </tr>
+            <tr>
+                <td>海洋布格校正 (C<sub>BO</sub>)</td>
+                <td>0.04193 &times; (&rho;<sub>rock</sub> - &rho;<sub>water</sub>) &times; D</td>
+                <td>33.48</td>
+            </tr>
+            <tr>
+                <td>布格重力異常 (&Delta;g<sub>B</sub>)</td>
+                <td>&Delta;g<sub>FA</sub> + C<sub>BO</sub></td>
+                <td>67.79</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
