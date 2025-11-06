@@ -1,0 +1,79 @@
+import numpy as np
+import math
+
+# --- 輸入數據 (Input Data) ---
+latitude_deg = 48.1195  # 緯度 (度)
+elevation_m = 487.9      # 高程 (米)
+g_obs_mgal = 980717.39  # 觀測重力 (mGal)
+rho_rock_gcc = 2.67      # 標準地殼密度 (g/cm^3)
+
+# --- 常數 (Constants) ---
+# IGSN-71 正常重力公式常數
+gamma_0 = 978031.85   # 赤道正常重力 (mGal)
+beta_1 = 0.005278895
+beta_2 = 0.000023462
+
+# 校正因子
+FAC_grad = 0.3086     # 自由空氣校正梯度 (mGal/m)
+BC_factor = 0.04193   # 布格校正因子 (mGal / (m * g/cm^3))
+
+# --- 計算 (Calculations) ---
+
+# 1. 將緯度轉換為弧度
+phi_rad = math.radians(latitude_deg)
+
+# i) 理論重力 (Theoretical Gravity, gamma_n)
+# 正常重力公式 (IGSN-71): gamma_n = gamma_0 * (1 + beta_1 * sin^2(phi) - beta_2 * sin^2(2*phi))
+sin_phi_sq = math.sin(phi_rad)**2
+sin_2phi_sq = (math.sin(2 * phi_rad))**2
+gamma_n = gamma_0 * (1 + beta_1 * sin_phi_sq - beta_2 * sin_2phi_sq)
+
+# ii) 自由空氣校正 (Free Air Correction, FAC)
+# FAC = FAC_grad * h (單位: mGal)
+FAC = FAC_grad * elevation_m
+
+# iii) 布格校正 (Bouguer Correction, BC)
+# BC = BC_factor * rho * h (單位: mGal)
+BC = BC_factor * rho_rock_gcc * elevation_m
+
+# iv) 自由空氣重力異常 (Free Air Anomaly, Delta_g_FA)
+# Delta_g_FA = g_obs - gamma_n + FAC
+Delta_g_FA = g_obs_mgal - gamma_n + FAC
+
+# v) 布格重力異常 (Bouguer Gravity Anomaly, Delta_g_B)
+# Delta_g_B = Delta_g_FA - BC
+# 另一個表達式: Delta_g_B = g_obs - gamma_n + FAC - BC
+Delta_g_B = Delta_g_FA - BC
+
+# --- 結果輸出 (Output Results) ---
+print("--- Part a) 陸地測站計算結果 ---")
+print(f"i) 理論重力 (Theoretical Gravity): {gamma_n:,.2f} mGal")
+print(f"ii) 自由空氣校正 (Free Air Correction, FAC): {FAC:,.2f} mGal")
+print(f"iii) 布格校正 (Bouguer Correction, BC, 密度=2.67): {BC:,.2f} mGal")
+print(f"iv) 自由空氣重力異常 (Free Air Anomaly): {Delta_g_FA:,.2f} mGal")
+print(f"v) 布格重力異常 (Bouguer Gravity Anomaly): {Delta_g_B:,.2f} mGal")
+
+# --- Part b) 海洋測站計算 (位於海面，水深 D = 487.9 m) ---
+water_depth_m = 487.9
+rho_water_gcc = 1.03
+# 觀測重力 g_obs_mgal 和 理論重力 gamma_n 沿用 Part a) 的數值
+
+# iv) 自由空氣重力異常 (Free Air Anomaly, Delta_g_FA_ocean)
+# 測站位於海平面 (h=0)，FAC = 0.3086 * 0 = 0
+# Delta_g_FA_ocean = g_obs - gamma_n + 0
+Delta_g_FA_ocean = g_obs_mgal - gamma_n
+
+# v) 布格重力異常 (Bouguer Gravity Anomaly, Delta_g_B_ocean)
+# 海洋布格校正 (BC_water) = 0.04193 * (rho_rock - rho_water) * D
+density_contrast = rho_rock_gcc - rho_water_gcc
+BC_water = BC_factor * density_contrast * water_depth_m
+
+# Delta_g_B_ocean = g_obs - gamma_n + BC_water
+Delta_g_B_ocean = Delta_g_FA_ocean + BC_water
+
+# --- 結果輸出 (Output Results) ---
+print("\n--- Part b) 海洋測站計算結果 (位於海面，水深 487.9 m) ---")
+print(f"理論重力 (Theoretical Gravity): {gamma_n:,.2f} mGal")
+print(f"水柱替換校正 (BC_water, 對比密度=2.67-1.03): {BC_water:,.2f} mGal")
+print(f"i) 自由空氣重力異常 (Free Air Anomaly): {Delta_g_FA_ocean:,.2f} mGal")
+print(f"ii) 布格重力異常 (Bouguer Gravity Anomaly): {Delta_g_B_ocean:,.2f} mGal")
